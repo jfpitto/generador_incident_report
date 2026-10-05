@@ -1,121 +1,99 @@
 import streamlit as st
 from docxtpl import DocxTemplate
-from datetime import datetime
+from datetime import datetime, time
 from pathlib import Path
 
-# ==================================
-# CONFIGURACION
-# ==================================
-
 st.set_page_config(
-    page_title="Generador Informe de Incidente",
+    page_title="Generador RCA",
+    page_icon="📄",
     layout="wide"
 )
 
-st.title("📄 Generador Informe de Incidente / RCA")
+st.title("📄 Generador de Informe de Incidente / RCA")
 
-# ==================================
+# ==================================================
 # DATOS GENERALES
-# ==================================
+# ==================================================
 
 st.header("Información General")
 
-incidente = st.text_input(
-    "N° Incidente *"
-)
-
-reportado_por = st.text_input(
-    "Reportado por *"
-)
-
-responsable = st.text_input(
-    "Responsable del incidente *"
-)
-
-# ==================================
-# FECHAS CON SELECTOR
-# ==================================
-
-st.subheader("Fechas del Incidente")
+incidente = st.text_input("Número de Incidente")
+reportado_por = st.text_input("Reportado por")
+responsable = st.text_input("Responsable")
 
 col1, col2 = st.columns(2)
 
 with col1:
-
-    fecha_inicio = st.date_input(
-        "Fecha Inicio *",
-        value=datetime.today()
-    )
-
+    fecha_inicio = st.date_input("Fecha Inicio")
     hora_inicio = st.time_input(
-        "Hora Inicio *",
-        value=datetime.now().time()
+        "Hora Inicio",
+        value=time(0, 0)
     )
 
 with col2:
-
-    fecha_fin = st.date_input(
-        "Fecha Fin *",
-        value=datetime.today()
-    )
-
+    fecha_fin = st.date_input("Fecha Fin")
     hora_fin = st.time_input(
-        "Hora Fin *",
-        value=datetime.now().time()
+        "Hora Fin",
+        value=time(0, 0)
     )
 
 forma_detectar = st.text_area(
-    "Forma de detectar *",
-    height=100
+    "Forma de detección"
 )
 
 procesos_impactados = st.text_area(
-    "Procesos impactados *",
-    height=100
+    "Procesos impactados"
 )
 
 tipo_incidente = st.selectbox(
-    "Tipo de Incidente *",
+    "Tipo de incidente",
     [
         "Disponibilidad",
         "Aplicación",
         "Infraestructura",
         "Base de Datos",
-        "Seguridad",
         "Red",
-        "Servicio"
+        "Seguridad"
     ]
 )
 
 estado = st.selectbox(
-    "Estado *",
-    [
-        "Abierto",
-        "Cerrado"
-    ]
+    "Estado",
+    ["Abierto", "Cerrado"]
 )
 
-# ==================================
+# ==================================================
 # RESUMEN
-# ==================================
+# ==================================================
 
-st.header("Resumen del Incidente")
+st.header("Resumen")
 
 resumen = st.text_area(
-    "Resumen del incidente *",
+    "Resumen del incidente",
     height=200
 )
 
-# ==================================
-# ACCIONES TOMADAS
-# ==================================
+# ==================================================
+# CAUSA
+# ==================================================
 
-st.header("Acciones Tomadas")
+st.header("Causa Raíz")
+
+causa = st.text_area(
+    "Causa identificada",
+    height=200
+)
+
+# ==================================================
+# ACCIONES
+# ==================================================
+
+st.header("Acciones Ejecutadas")
 
 acciones = []
 
 cantidad_acciones = st.number_input(
-    "Cantidad de acciones realizadas",
+    "Número de acciones",
     min_value=1,
     max_value=20,
     value=3
@@ -123,53 +101,38 @@ cantidad_acciones = st.number_input(
 
 for i in range(cantidad_acciones):
 
-    st.subheader(f"Acción {i + 1}")
+    st.subheader(f"Acción {i+1}")
 
-    col1, col2, col3 = st.columns([2, 2, 6])
+    col1, col2 = st.columns(2)
 
     with col1:
-
-        fecha_accion = st.text_input(
+        fecha_accion = st.date_input(
             "Fecha",
             key=f"fecha_accion_{i}"
         )
 
     with col2:
-
-        hora_accion = st.text_input(
+        hora_accion = st.time_input(
             "Hora",
             key=f"hora_accion_{i}"
         )
 
-    with col3:
+    detalle = st.text_input(
+        "Detalle",
+        key=f"detalle_accion_{i}"
+    )
 
-        detalle_accion = st.text_input(
-            "Detalle",
-            key=f"detalle_accion_{i}"
-        )
-
-    if detalle_accion.strip():
+    if detalle:
 
         acciones.append({
-            "fecha": fecha_accion,
-            "hora": hora_accion,
-            "detalle": detalle_accion
+            "fecha": fecha_accion.strftime("%d/%m/%Y"),
+            "hora": hora_accion.strftime("%H:%M"),
+            "detalle": detalle
         })
 
-# ==================================
-# CAUSA
-# ==================================
-
-st.header("Causa del Problema")
-
-causa = st.text_area(
-    "Causa identificada *",
-    height=200
-)
-
-# ==================================
-# PLAN DE ACCION
-# ==================================
+# ==================================================
+# PLANES DE ACCIÓN
+# ==================================================
 
 st.header("Plan de Acción")
 
@@ -184,33 +147,25 @@ cantidad_planes = st.number_input(
 
 for i in range(cantidad_planes):
 
-    st.subheader(f"Actividad {i + 1}")
-
     actividad = st.text_input(
-        "Actividad",
+        f"Actividad {i+1}",
         key=f"actividad_{i}"
     )
 
     responsable_plan = st.text_input(
         "Responsable",
-        key=f"responsable_plan_{i}"
+        key=f"resp_{i}"
     )
 
-    col1, col2 = st.columns(2)
+    fecha_inicio_plan = st.date_input(
+        "Inicio",
+        key=f"inicio_{i}"
+    )
 
-    with col1:
-
-        fecha_inicio_plan = st.date_input(
-            "Fecha Inicio",
-            key=f"inicio_plan_{i}"
-        )
-
-    with col2:
-
-        fecha_fin_plan = st.date_input(
-            "Fecha Fin",
-            key=f"fin_plan_{i}"
-        )
+    fecha_fin_plan = st.date_input(
+        "Fin",
+        key=f"fin_{i}"
+    )
 
     estado_plan = st.selectbox(
         "Estado",
@@ -219,78 +174,59 @@ for i in range(cantidad_planes):
             "En Progreso",
             "Completado"
         ],
-        key=f"estado_plan_{i}"
+        key=f"estado_{i}"
     )
 
-    if actividad.strip():
+    if actividad:
 
         planes.append({
-
             "numero": i + 1,
             "actividad": actividad,
             "responsable": responsable_plan,
-
-            "fecha_inicio": fecha_inicio_plan.strftime(
-                "%d/%m/%Y"
-            ),
-
-            "fecha_fin": fecha_fin_plan.strftime(
-                "%d/%m/%Y"
-            ),
-
+            "fecha_inicio": fecha_inicio_plan.strftime("%d/%m/%Y"),
+            "fecha_fin": fecha_fin_plan.strftime("%d/%m/%Y"),
             "estado": estado_plan
         })
 
-# ==================================
+# ==================================================
 # RCA
-# ==================================
-
-st.header("Tipo de RCA")
+# ==================================================
 
 tipo_rca = st.radio(
-    "Seleccione una opción",
+    "Tipo RCA",
     [
         "DEFINITIVA",
         "TEMPORAL"
     ]
 )
 
-# ==================================
-# EQUIPO INVESTIGADOR
-# ==================================
+# ==================================================
+# EQUIPO
+# ==================================================
 
-st.header("Equipo de Investigación")
+st.header("Equipo Investigador")
 
-departamento = st.text_input(
-    "Departamento"
-)
+departamento = st.text_input("Departamento")
+investigador = st.text_input("Investigador")
+cargo = st.text_input("Cargo")
 
-nombre_investigador = st.text_input(
-    "Investigador"
-)
+# ==================================================
+# GENERAR
+# ==================================================
 
-cargo_investigador = st.text_input(
-    "Cargo"
-)
+if st.button("Generar Informe"):
 
-# ==================================
-# GENERAR DOCUMENTO
-# ==================================
-
-if st.button("🚀 Generar Informe"):
-
-    if not all([
+    campos = [
         incidente,
         reportado_por,
         responsable,
-        forma_detectar,
-        procesos_impactados,
         resumen,
         causa
-    ]):
+    ]
 
+    if not all(campos):
         st.error(
-            "⚠️ Complete todos los campos obligatorios."
+            "Complete los campos obligatorios."
         )
         st.stop()
 
@@ -299,21 +235,11 @@ if st.button("🚀 Generar Informe"):
     ).exists():
 
         st.error(
-            "⚠️ No se encontró el archivo template_incidente.docx"
+            "No existe template_incidente.docx"
         )
         st.stop()
 
     try:
-
-        fecha_inicio_str = datetime.combine(
-            fecha_inicio,
-            hora_inicio
-        ).strftime("%d/%m/%Y %H:%M")
-
-        fecha_fin_str = datetime.combine(
-            fecha_fin,
-            hora_fin
-        ).strftime("%d/%m/%Y %H:%M")
 
         doc = DocxTemplate(
             "template_incidente.docx"
@@ -321,88 +247,81 @@ if st.button("🚀 Generar Informe"):
 
         context = {
 
-            # ENCABEZADO
-
             "codigo": incidente,
-            "fecha": datetime.now().strftime(
-                "%d/%m/%Y"
-            ),
-
-            # DATOS GENERALES
+            "fecha": datetime.now().strftime("%d/%m/%Y"),
 
             "incidente": incidente,
             "reportado_por": reportado_por,
             "responsable": responsable,
 
-            "fecha_inicio": fecha_inicio_str,
-            "fecha_fin": fecha_fin_str,
+            "fecha_inicio": datetime.combine(
+                fecha_inicio,
+                hora_inicio
+            ).strftime("%d/%m/%Y %H:%M"),
+
+            "fecha_fin": datetime.combine(
+                fecha_fin,
+                hora_fin
+            ).strftime("%d/%m/%Y %H:%M"),
 
             "forma_detectar": forma_detectar,
             "procesos_impactados": procesos_impactados,
             "tipo_incidente": tipo_incidente,
             "estado": estado,
 
-            # RESUMEN
-
             "resumen": resumen,
-
-            # ACCIONES
-
-            "acciones": acciones,
-
-            # CAUSA
-
             "causa": causa,
 
-            # PLAN DE ACCIÓN
-
+            "acciones": acciones,
             "planes": planes,
 
-            # RCA
-
             "rca_definitiva":
-                "X"
-                if tipo_rca == "DEFINITIVA"
-                else "",
+                "X" if tipo_rca == "DEFINITIVA" else "",
 
             "rca_temporal":
-                "X"
-                if tipo_rca == "TEMPORAL"
-                else "",
-
-            # EQUIPO
+                "X" if tipo_rca == "TEMPORAL" else "",
 
             "departamento": departamento,
-            "nombre_investigador": nombre_investigador,
-            "cargo_investigador": cargo_investigador
+            "nombre_investigador": investigador,
+            "cargo_investigador": cargo
         }
 
-       doc.render(context)
+        doc.render(context)
 
-archivo_seguro = (
-    incidente
-    .replace('/', '_')
-    .replace('\\', '_')
-    .replace(':', '_')
-    .replace('*', '_')
-    .replace('?', '_')
-    .replace('"', '_')
-    .replace('<', '_')
-    .replace('>', '_')
-    .replace('|', '_')
-)
+        archivo_seguro = (
+            incidente
+            .replace("/", "_")
+            .replace("\\", "_")
+            .replace(":", "_")
+            .replace("*", "_")
+            .replace("?", "_")
+            .replace("\"", "_")
+            .replace("<", "_")
+            .replace(">", "_")
+            .replace("|", "_")
+        )
 
-nombre_archivo = f"Incidente_{archivo_seguro}.docx"
+        nombre_archivo = (
+            f"Incidente_{archivo_seguro}.docx"
+        )
 
-doc.save(nombre_archivo)
+        doc.save(nombre_archivo)
 
-with open(nombre_archivo, 'rb') as archivo:
+        with open(
+            nombre_archivo,
+            "rb"
+        ) as archivo:
 
-    st.download_button(
-        label='📥 Descargar Informe',
-        data=archivo.read(),
-        file_name=nombre_archivo,
-        mime='application/vnd.openxmlformats-officedocument.wordprocessingml.document'
-    )
+            st.download_button(
+                label="📥 Descargar Informe",
+                data=archivo.read(),
+                file_name=nombre_archivo,
+                mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+            )
 
-st.success('✅ Informe generado correctamente')
+        st.success(
+            "✅ Informe generado correctamente"
+        )
+
+    except Exception as e:
+        st.exception(e)
