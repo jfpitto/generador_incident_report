@@ -376,8 +376,7 @@ if st.button("🚀 Generar Informe"):
             "nombre_investigador": nombre_investigador,
             "cargo_investigador": cargo_investigador
         }
-
-               doc.render(context)
+        doc.render(context)
 
         archivo_seguro = (
             incidente
