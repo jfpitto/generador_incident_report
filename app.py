@@ -392,6 +392,24 @@ if st.button("🚀 Generar Informe"):
             .replace("|", "_")
         )
 
-        nombre_archivo = (
-            f"Incidente_{archivo_seguro}.docx"
+                nombre_archivo = f"Incidente_{archivo_seguro}.docx"
+
+        doc.save(nombre_archivo)
+
+        with open(nombre_archivo, "rb") as archivo:
+
+            st.download_button(
+                label="📥 Descargar Informe",
+                data=archivo,
+                file_name=nombre_archivo,
+                mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+            )
+
+        st.success(
+            "✅ Informe generado correctamente"
+        )
+
+    except Exception as e:
+
+        st.exception(e)
   
